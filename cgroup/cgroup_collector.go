@@ -26,38 +26,17 @@ type cgroupMemoryCollector struct {
 func NewCGroupMemoryCollector() prometheus.Collector {
 	// Initialize all desired metrics with their descriptions
 	metrics := []cgroupMetric{
-		{
-			Path:   "/sys/fs/cgroup/memory/memory.kmem.usage_in_bytes",
-			Metric: prometheus.NewDesc("cgroup_kmem_memory_usage_bytes", "Memory usage of the cgroup in bytes.", nil, nil),
-		},
-		{
-			Path:   "/sys/fs/cgroup/memory/memory.kmem.max_usage_in_bytes",
-			Metric: prometheus.NewDesc("cgroup_kmem_memory_max_usage_bytes", "Maximum memory usage of the cgroup in bytes.", nil, nil),
-		},
-		{
-			Path:   "/sys/fs/cgroup/memory/memory.kmem.limit_in_bytes",
-			Metric: prometheus.NewDesc("cgroup_kmem_memory_limit_bytes", "Memory limit of the cgroup in bytes.", nil, nil),
-		},
-		{
-			Path:   "/sys/fs/cgroup/memory/memory.kmem.failcnt",
-			Metric: prometheus.NewDesc("cgroup_kmem_memory_failcnt", "Number of memory usage hits limits.", nil, nil),
-		},
-		{
-			Path:   "/sys/fs/cgroup/memory/memory.usage_in_bytes",
-			Metric: prometheus.NewDesc("cgroup_memory_usage_bytes", "Memory usage of the cgroup in bytes.", nil, nil),
-		},
-		{
-			Path:   "/sys/fs/cgroup/memory/memory.max_usage_in_bytes",
-			Metric: prometheus.NewDesc("cgroup_memory_max_usage_bytes", "Maximum memory usage of the cgroup in bytes.", nil, nil),
-		},
-		{
-			Path:   "/sys/fs/cgroup/memory/memory.limit_in_bytes",
-			Metric: prometheus.NewDesc("cgroup_memory_limit_bytes", "Memory limit of the cgroup in bytes.", nil, nil),
-		},
-		{
-			Path:   "/sys/fs/cgroup/memory/memory.failcnt",
-			Metric: prometheus.NewDesc("cgroup_memory_failcnt", "Number of memory usage hits limits.", nil, nil),
-		},
+		makeCgroupMetric("usage_in_bytes", "Memory usage of the cgroup in bytes."),
+		makeCgroupMetric("max_usage_in_bytes", "Maximum memory usage of the cgroup in bytes."),
+		makeCgroupMetric("limit_in_bytes", "Memory limit of the cgroup in bytes."),
+		makeCgroupMetric("failcnt", "Number of memory usage limit hits."),
+		makeCgroupMetric("kmem.usage_in_bytes", "Kernel memory usage of the cgroup in bytes."),
+		makeCgroupMetric("kmem.limit_in_bytes", "Kernel memory limit of the cgroup in bytes."),
+		makeCgroupMetric("kmem.failcnt", "Kernel number of memory usage hits limits."),
+		makeCgroupMetric("kmem.tcp.usage_in_bytes", "TCP buffer memory usage in bytes"),
+		makeCgroupMetric("kmem.tcp.limit_in_bytes", "TCP buffer memory limit in bytes"),
+		makeCgroupMetric("kmem.tcp.max_usage_in_bytes", "TCP buffer memory max usage in bytes"),
+		makeCgroupMetric("kmem.tcp.failcnt", "TCP buffer memory usage limit hits"),
 	}
 	statMetrics := []statMetric{
 		makeStatMetric("rss"),
@@ -71,6 +50,13 @@ func NewCGroupMemoryCollector() prometheus.Collector {
 	}
 
 	return &cgroupMemoryCollector{metrics: metrics, statMetrics: statMetrics}
+}
+
+func makeCgroupMetric(dotpath string, help string) cgroupMetric {
+	return cgroupMetric{
+		Path:   "/sys/fs/cgroup/memory/memory." + dotpath,
+		Metric: prometheus.NewDesc("cgroup_"+strings.ReplaceAll(dotpath, ".", "_"), help, nill, nill),
+	}
 }
 
 func makeStatMetric(nameInStat string) statMetric {
