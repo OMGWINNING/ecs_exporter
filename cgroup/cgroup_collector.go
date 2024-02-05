@@ -55,7 +55,7 @@ func NewCGroupMemoryCollector() prometheus.Collector {
 func makeCgroupMetric(dotpath string, help string) cgroupMetric {
 	return cgroupMetric{
 		Path:   "/sys/fs/cgroup/memory/memory." + dotpath,
-		Metric: prometheus.NewDesc("cgroup_"+strings.ReplaceAll(dotpath, ".", "_"), help, nill, nill),
+		Metric: prometheus.NewDesc("cgroup_"+strings.ReplaceAll(dotpath, ".", "_"), help, nil, nil),
 	}
 }
 
