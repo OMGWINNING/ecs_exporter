@@ -1,3 +1,28 @@
+# JT Notes
+Build is just local and manually pushed to our ecs_exporter ecr 
+I had to pull this dep manually:
+```
+docker pull quay.io/prometheus/busybox-linux-amd64:latest
+```
+Build binary by running:
+```
+$ env GOOS=linux GOARCH=amd go build
+``` 
+from within project dir. Then can build the container by running:
+```
+make docker
+```
+
+Next tag the build appropriately for our repo:
+```
+docker tag 209202477790.dkr.ecr.us-east-1.amazonaws.com/ecs_exporter/ecs-exporter-linux-amd64:YOUR-BRANCH-NAME 209202477790.dkr.ecr.us-east-1.amazonaws.com/ecs_exporter:latest
+```
+
+Finally, push to our ECR:
+```
+docker push 209202477790.dkr.ecr.us-east-1.amazonaws.com/ecs_exporter:latest
+```
+
 # ecs_exporter
 
 [![CircleCI](https://circleci.com/gh/prometheus-community/ecs_exporter/tree/main.svg?style=svg)](https://circleci.com/gh/prometheus-community/ecs_exporter/tree/main)
